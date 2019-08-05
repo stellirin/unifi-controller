@@ -1,0 +1,15 @@
+#!/bin/bash
+
+UNIFI_VER=$(grep -o 'UNIFI_VER=.*' Dockerfile | cut -d '=' -f 2-)
+UNIFI_VER=(${UNIFI_VER//./ })
+
+if [[ "${UNIFI_VER}" != "" ]]
+then
+    echo "Tagging 'latest' as '${UNIFI_VER[0]}.${UNIFI_VER[1]}' and '${UNIFI_VER[0]}.${UNIFI_VER[1]}.${UNIFI_VER[2]}'"
+    docker tag ${DOCKER_REPO}:latest ${DOCKER_REPO}:${UNIFI_VER[0]}.${UNIFI_VER[1]}
+    docker tag ${DOCKER_REPO}:latest ${DOCKER_REPO}:${UNIFI_VER[0]}.${UNIFI_VER[1]}.${UNIFI_VER[2]}
+    docker push ${DOCKER_REPO}:${UNIFI_VER[0]}.${UNIFI_VER[1]}
+    docker push ${DOCKER_REPO}:${UNIFI_VER[0]}.${UNIFI_VER[1]}.${UNIFI_VER[2]}
+else
+    echo "No additional tags found!"
+fi

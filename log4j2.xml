@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration>
+  <Appenders>
+    <Console name="console" target="SYSTEM_OUT">
+      <PatternLayout charset="UTF-8" pattern="[%d{ISO8601}] &lt;%t&gt; %-5p %-6c{1} - %m%n" />
+    </Console>
+  </Appenders>
+  <Loggers>
+    <Root level="INFO">
+      <AppenderRef ref="console" />
+    </Root>
+    <Logger name="org.apache.log4j.xml" level="info" />
+    <Logger name="java" level="ERROR" />
+    <Logger name="javax" level="ERROR" />
+    <Logger name="javax.jmdns" level="OFF" />
+    <Logger name="sun" level="ERROR" />
+    <Logger name="org.apache" level="WARN" />
+    <Logger name="httpclient.wire" level="WARN" />
+    <Logger name="net.schmizz" level="ERROR" />
+    <Logger name="com.codahale" level="ERROR" />
+    <Logger name="org.apache.tomcat" level="ERROR" />
+    <Logger name="org.apache.commons" level="WARN" />
+    <Logger name="org.apache.catalina" level="WARN" />
+    <Logger name="com.mongodb" level="ERROR" />
+    <Logger name="org.mongodb" level="ERROR" />
+
+    <Logger name="org.springframework" level="WARN" />
+    <Logger name="de.javawi.jstun" level="WARN" />
+
+    <Logger name="com.ubnt" level="INFO" />
+    <Logger name="com.ubiquiti" level="INFO" />
+
+    <Logger name="com.netflix.servo" level="INFO" />
+    <Logger name="com.amazonaws.internal" level="WARN" />
+  </Loggers>
+</Configuration>
