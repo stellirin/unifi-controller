@@ -1,6 +1,7 @@
 # Supported tags and respective `Dockerfile` links
 
-- [`latest, 5.10.27`](https://github.com/stellirin/unifi-controller/blob/master/Dockerfile)
+- [`latest, 5.11, 5.11.39`](https://github.com/stellirin/unifi-controller/blob/master/Dockerfile)
+- [`5.10, 5.10.27`](https://github.com/stellirin/unifi-controller/blob/5.10.x/Dockerfile)
 
 # Quick reference
 
@@ -29,12 +30,14 @@ Motivation for this project comes from the limitations of the source DEB. Specif
 **\* \* \* NOTE: this project is still a WIP \* \* \***
 
 ## **TODO**
-- Custom TLS certificates
 - MongoDB authentication
+- Custom TLS certificates
+- Let's Encrypt
+- Aarch64 for Raspberry Pi
 
 # How to use this image
 
-This container images must be used in conjunction with an existing MongoDB installation. The simplest method is to use a MongoDB container image.
+This container image must be used in conjunction with an existing MongoDB installation. The simplest method is to use a MongoDB container image.
 
 ## Single-node Docker Compose
 
@@ -65,13 +68,19 @@ When you start the image, you can adjust the initialization of the instance by p
 
 URI to the MongoDB installation. It can be a single host or multiple hosts in a ReplicaSet.
 
-Default value is: `mongodb://localhost:27017`
+Default value is `mongodb://localhost:27017`.
+
+### `MONGO_DB_STAT_URI`
+
+URI to the MongoDB stat installation. It can be a single host or multiple hosts in a ReplicaSet.
+
+Default is to take the same value as `MONGO_DB_URI`.
 
 ### `MONGO_DB_NAME`
 
 The database name on the MongoDB installation.
 
-Default value is: `unifi`
+Default value is `unifi`.
 
 ### `UNIFI_HTTPS_PORT`
 
@@ -79,13 +88,25 @@ The port used for the controller UI. By default a container runs without the req
 
 Typically port `443` is achieved at the container platform level (bind external port `443` to internal port `8443`) but this is useful if you are using `--network="host"` and `--cap-add="NET_BIND_SERVICE"`.
 
-Default value is: `8443`
+Default value is `8443`.
+
+### `UNIFI_TLS_FULLCHAIN`
+
+The path to a full chain certificate that is used for TLS connections to the UI. If no value is supplied then UniFi will generate an untrusted certificate for testing purposes.
+
+No default value.
+
+### `UNIFI_TLS_PRIVKEY`
+
+The path to a private key that is used for TLS connections to the UI. If no value is supplied then UniFi will generate an untrusted certificate for testing purposes.
+
+No default value.
 
 ## Advanced Environment Variables
 
 ### `JAVA_ENTROPY_GATHER_DEVICE`
 
-Provide an alternative source of randomness. Java will use `/dev/randon` on some linux systems, which is a blocking function and may cause slowdowns. A good alternative is to use `/dev/./urandom` which will not block.
+Provide an alternative source of randomness. Java will use `/dev/random` on some linux systems, which is a blocking function and may cause slowdowns. A good alternative is to use `/dev/./urandom` which will not block.
 
 No default value.
 

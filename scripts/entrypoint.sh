@@ -4,14 +4,77 @@ JVM_EXTRA_OPTS=
 JVM_MAX_HEAP_SIZE=${JVM_MAX_HEAP_SIZE:-"1024M"}
 MONGO_DB_NAME=${MONGO_DB_NAME:-"unifi"}
 MONGO_DB_URI=${MONGO_DB_URI:-"mongodb://localhost:27017"}
+MONGO_DB_STAT_URI=${MONGO_DB_STAT_URI:-"${MONGO_DB_URI}"}
 UNIFI_HTTPS_PORT=${UNIFI_HTTPS_PORT:-"8443"}
 
 # OpenShift requires ability to run as arbitrary user ID
-arbitrary_user_id() {
+set_user_id() {
     USER_NAME=unifi
     if ! whoami &> /dev/null; then
         if [ -w /etc/passwd ]; then
             echo "${USER_NAME}:x:$(id -u):0:${USER_NAME} user:${BASEDIR}:/sbin/nologin" >> /etc/passwd
+        fi
+    fi
+}
+
+set_tls_keystore() {
+    if [ -n "${UNIFI_TLS_FULLCHAIN}" ] && [ -n "${UNIFI_TLS_PRIVKEY}" ]
+    then
+        if [ -f "${UNIFI_TLS_FULLCHAIN}" ] && [ -f "${UNIFI_TLS_PRIVKEY}" ]
+        then
+            echo "INFO: Creating custom TLS keystore ..."
+
+            if [ -f "/var/lib/unifi/keystore" ]
+            then
+                echo "INFO: Creating backup keystore ..."
+                mv /var/lib/unifi/keystore /var/lib/unifi/keystore.backup
+            fi
+
+            # Convert cert to PKCS12 format
+            # Ignore warnings
+            openssl pkcs12 \
+                -export \
+                -in ${UNIFI_TLS_FULLCHAIN} \
+                -inkey ${UNIFI_TLS_PRIVKEY} \
+                -out /tmp/keystore.p12 \
+                -name unifi \
+                -password pass:unifi
+
+            if [ -f "/tmp/keystore.p12" ]
+            then
+                echo "INFO: Creating final keystore ..."
+                keytool \
+                    -noprompt \
+                    -importkeystore \
+                    -srckeystore /tmp/keystore.p12 \
+                    -srcstoretype PKCS12 \
+                    -srcstorepass unifi \
+                    -destkeystore /var/lib/unifi/keystore \
+                    -destkeypass aircontrolenterprise \
+                    -deststorepass aircontrolenterprise \
+                    -alias unifi
+            fi
+
+            if [ -f "/var/lib/unifi/keystore" ]
+            then
+                echo "INFO: Final keystore created"
+                rm -f /tmp/fullchain.p12
+                if [ -f "/var/lib/unifi/keystore.backup" ]
+                then
+                    echo "INFO: Removing backup keystore"
+                    rm -f /var/lib/unifi/keystore.backup
+                fi
+            else
+                echo "WARN: Final keystore not created!" 
+                rm -f /tmp/fullchain.p12
+                if [ -f "/var/lib/unifi/keystore.backup" ]
+                then
+                    echo "INFO: Restoring backup keystore"
+                    mv /var/lib/unifi/keystore.backup /var/lib/unifi/keystore
+                fi
+            fi
+        else
+            echo "WARN: Path to certificates supplied but file(s) not found!"
         fi
     fi
 }
@@ -73,11 +136,13 @@ unifi_stop() {
     fi
 }
 
-arbitrary_user_id
+set_user_id
+
+set_tls_keystore
 
 set_system_property "db.mongo.local=false"
 set_system_property "db.mongo.uri=${MONGO_DB_URI}"
-set_system_property "statdb.mongo.uri=${MONGO_DB_URI}"
+set_system_property "statdb.mongo.uri=${MONGO_DB_STAT_URI}"
 set_system_property "unifi.db.name=${MONGO_DB_NAME}"
 set_system_property "unifi.https.port=${UNIFI_HTTPS_PORT}"
 

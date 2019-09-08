@@ -1,6 +1,6 @@
 #!/bin/sh
 
-MAX_WAIT=60
+MAX_WAIT=10
 HTTP_CODE=$(curl -s --connect-timeout 1 -o /dev/null -w "%{HTTP_CODE}" http://localhost:8080/status)
 for i in `seq 1 ${MAX_WAIT}` ; do
     if [ "${HTTP_CODE}" != "200" ]; then
