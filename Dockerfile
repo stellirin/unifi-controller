@@ -3,8 +3,8 @@
 #
 FROM adoptopenjdk:8-jre-openj9
 
-ARG UNIFI_VER=5.11.39
-ARG UNIFI_URL=https://dl.ubnt.com/unifi/${UNIFI_VER}/unifi_sysvinit_all.deb
+ARG UNIFI_VER=5.11.45-6cc8cc5c2a
+ARG UNIFI_URL=https://dl.ui.com/unifi/${UNIFI_VER}/unifi_sysvinit_all.deb
 
 # Set the product installation directory
 ENV BASEDIR=/usr/lib/unifi \

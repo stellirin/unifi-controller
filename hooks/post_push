@@ -1,14 +1,18 @@
 #!/bin/bash
 
+if [[ "$(git rev-parse --abbrev-ref HEAD)" == "master" ]]
+then
+    # Latest will often mean unstable, so do not create a 'release' tag.
+    exit 0
+fi
+
 UNIFI_VER=$(grep -o 'UNIFI_VER=.*' Dockerfile | cut -d '=' -f 2-)
 UNIFI_VER=(${UNIFI_VER//./ })
 
 if [[ "${UNIFI_VER}" != "" ]]
 then
-    echo "Tagging 'latest' as '${UNIFI_VER[0]}.${UNIFI_VER[1]}' and '${UNIFI_VER[0]}.${UNIFI_VER[1]}.${UNIFI_VER[2]}'"
-    docker tag ${DOCKER_REPO}:latest ${DOCKER_REPO}:${UNIFI_VER[0]}.${UNIFI_VER[1]}
-    docker tag ${DOCKER_REPO}:latest ${DOCKER_REPO}:${UNIFI_VER[0]}.${UNIFI_VER[1]}.${UNIFI_VER[2]}
-    docker push ${DOCKER_REPO}:${UNIFI_VER[0]}.${UNIFI_VER[1]}
+    echo "Tagging latest '${UNIFI_VER[0]}.${UNIFI_VER[1]}' as '${UNIFI_VER[0]}.${UNIFI_VER[1]}.${UNIFI_VER[2]}'"
+    docker tag ${DOCKER_REPO}:${UNIFI_VER[0]}.${UNIFI_VER[1]} ${DOCKER_REPO}:${UNIFI_VER[0]}.${UNIFI_VER[1]}.${UNIFI_VER[2]}
     docker push ${DOCKER_REPO}:${UNIFI_VER[0]}.${UNIFI_VER[1]}.${UNIFI_VER[2]}
 else
     echo "No additional tags found!"
