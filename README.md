@@ -31,12 +31,11 @@ This project is not an official container image, nor is it associated with Ubiqu
 
 Motivation for this project comes from the limitations of the source DEB. Specifically, the DEB is restricted to use MongoDB v3.4 because of how the UniFi scripts connect to a locally installed DB. However, UniFi runs perfectly fine on MongoDB v4.0 when connecting to a 'remote' MongoDB installation (i.e. via URI instead of socket).
 
+By default the controller will generate untrusted TLS certificates. This container can also use trusted certificates, for example from Let's Encrypt. The container will also watch any provided certificates for change and trigger a restart.
+
 **\* \* \* NOTE: this project is still a WIP \* \* \***
 
 ## **TODO**
-- MongoDB authentication
-- Custom TLS certificates
-- Let's Encrypt
 - Aarch64 for Raspberry Pi
 
 # How to use this image
