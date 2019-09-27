@@ -74,7 +74,7 @@ set_tls_keystore() {
                 # Certificates installed, watch for changes
                 /certwatch.sh &
             else
-                echo "ERROR: Final TLS keystore not created!" 
+                echo "ERROR: Final TLS keystore not created!"
                 rm -f /tmp/fullchain.p12
                 if [ -f "/var/lib/unifi/keystore.backup" ]
                 then
