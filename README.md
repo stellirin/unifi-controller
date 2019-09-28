@@ -1,12 +1,13 @@
 # Supported tags and respective `Dockerfile` links
 
 - [`latest`](https://github.com/stellirin/unifi-controller/blob/master/Dockerfile)
-- [`5.11, 5.11.46`](https://github.com/stellirin/unifi-controller/blob/5.11.xx/Dockerfile)
+- [`5.11.46`](https://github.com/stellirin/unifi-controller/blob/5.11.46/Dockerfile)
+
+NOTE: `latest` may contain a Release Candidate build. If you wish for stability use a more specific tag!
 
 # Unsupported tags
-- `5.11.39`
-- `5.10`
-- `5.10.27`
+- [`5.11.39`](https://github.com/stellirin/unifi-controller/blob/5.11.39/Dockerfile)
+- [`5.10.27`](https://github.com/stellirin/unifi-controller/blob/5.10.27/Dockerfile)
 
 # Quick reference
 
@@ -68,15 +69,39 @@ Paste in the contents of `Appendix C`.
 
 When you start the image, you can adjust the initialization of the instance by passing one or more environment variables.
 
+### `MONGO_DB_HOST`
+
+Host name of the MongoDB installation.
+
+Default value is `localhost`.
+
+### `MONGO_DB_PORT`
+
+Port of the MongoDB installation.
+
+Default value is `27017`.
+
+### `MONGO_DB_USER`
+
+Username for authentication on the MongoDB installation.
+
+No default value.
+
+### `MONGO_DB_PASS`
+
+Password for authentication on the MongoDB installation.
+
+No default value.
+
 ### `MONGO_DB_URI`
 
-URI to the MongoDB installation. It can be a single host or multiple hosts in a ReplicaSet.
+Full URI for the MongoDB installation. For more complex installations. It can be a single host or multiple hosts in a Replica Set.
 
-Default value is `mongodb://localhost:27017`.
+Default value will be generated as `mongodb://localhost:27017` unless other MongoDB variables are specified above.
 
 ### `MONGO_DB_STAT_URI`
 
-URI to the MongoDB stat installation. It can be a single host or multiple hosts in a ReplicaSet.
+Full URI to the MongoDB stat installation. For more complex installations. It can be a single host or multiple hosts in a Replica Set.
 
 Default is to take the same value as `MONGO_DB_URI`.
 
@@ -177,7 +202,7 @@ services:
         source: unifi
         target: /var/lib/unifi
     environment:
-      DB_MONGO_URI: "mongodb://mongo0:27017"
+      DB_MONGO_HOST: "mongo0"
 ```
 
 # Appendix B: Multi-node Docker Compose

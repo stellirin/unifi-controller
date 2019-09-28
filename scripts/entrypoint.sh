@@ -2,8 +2,16 @@
 
 JVM_EXTRA_OPTS=
 JVM_MAX_HEAP_SIZE=${JVM_MAX_HEAP_SIZE:-"1024M"}
+if [ -z "${MONGO_DB_URI}" ]
+then
+    if [ -n "${MONGO_DB_USER}" ] && [ -n "${MONGO_DB_PASS}" ]
+    then
+        MONGO_DB_URI=mongodb://${MONGO_DB_USER}:${MONGO_DB_PASS}@${MONGO_DB_HOST:-"localhost"}:${MONGO_DB_PORT:-"27017"}
+    else
+        MONGO_DB_URI=mongodb://${MONGO_DB_HOST:-"localhost"}:${MONGO_DB_PORT:-"27017"}
+    fi
+fi
 MONGO_DB_NAME=${MONGO_DB_NAME:-"unifi"}
-MONGO_DB_URI=${MONGO_DB_URI:-"mongodb://localhost:27017"}
 MONGO_DB_STAT_URI=${MONGO_DB_STAT_URI:-"${MONGO_DB_URI}"}
 UNIFI_HTTPS_PORT=${UNIFI_HTTPS_PORT:-"8443"}
 
