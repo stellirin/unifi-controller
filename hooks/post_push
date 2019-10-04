@@ -2,7 +2,9 @@
 
 # Tag and push image for each additional tag
 for TAG in `git tag -l --points-at HEAD`
-do  
+do
     docker tag ${IMAGE_NAME} ${DOCKER_REPO}:${TAG}
+    docker tag ${IMAGE_NAME} ${DOCKER_REPO}:stable
     docker push ${DOCKER_REPO}:${TAG}
+    docker push ${DOCKER_REPO}:stable
 done
