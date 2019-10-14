@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 MAX_WAIT=10
 HTTP_CODE=$(curl -s --connect-timeout 1 -o /dev/null -w "%{HTTP_CODE}" http://localhost:8080/status)

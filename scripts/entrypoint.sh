@@ -17,7 +17,7 @@ UNIFI_HTTPS_PORT=${UNIFI_HTTPS_PORT:-"8443"}
 
 # OpenShift requires ability to run as arbitrary user ID
 set_user_id() {
-    USER_NAME=unifi
+    local USER_NAME=unifi
     if ! whoami &> /dev/null; then
         if [ -w /etc/passwd ]; then
             echo "${USER_NAME}:x:$(id -u):0:${USER_NAME} user:${BASEDIR}:/sbin/nologin" >> /etc/passwd
@@ -147,12 +147,8 @@ unifi_stop() {
     JVM_OPTS="${JVM_EXTRA_OPTS} -Xmx${JVM_MAX_HEAP_SIZE} ${UNIFI_JVM_EXTRA_OPTS}"
     java ${JVM_OPTS} -jar ${BASEDIR}/lib/ace.jar stop
 
-    if [ $? -ne 0 ]
-    then
-        exit 1
-    else
-        exit 0
-    fi
+    # Container exit code is UniFi exit code
+    exit $?
 }
 
 set_user_id
@@ -182,6 +178,7 @@ trap unifi_stop INT KILL TERM
 # Keep PID 1 alive until UniFi exits
 while true
 do
+    # This doesn't actually kill the process, it just tests if $PID is something that could be killed (i.e. the process exists)
     kill -0 $PID
     if [ $? -gt 0 ]
     then

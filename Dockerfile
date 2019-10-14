@@ -3,7 +3,7 @@
 #
 FROM adoptopenjdk:8-jre-openj9
 
-ARG UNIFI_VER=5.11.50-c9dac5377d
+ARG UNIFI_VER=5.11.50
 ARG UNIFI_URL=https://dl.ui.com/unifi/${UNIFI_VER}/unifi_sysvinit_all.deb
 
 # Set the product installation directory
@@ -50,7 +50,7 @@ EXPOSE 8880/tcp
 EXPOSE 8843/tcp
 EXPOSE 10001/udp
 
-HEALTHCHECK --start-period=5m --interval=1m --timeout=15s --retries=3 \
+HEALTHCHECK --start-period=2m --interval=1m --timeout=15s --retries=3 \
         CMD ["/healthcheck.sh"]
 
 # Containers should NOT run as root
