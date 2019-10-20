@@ -3,7 +3,7 @@
 #
 FROM adoptopenjdk:8-jre-openj9
 
-ARG UNIFI_VER=5.11.50
+ARG UNIFI_VER=5.12.19-98bbc5381e
 ARG UNIFI_URL=https://dl.ui.com/unifi/${UNIFI_VER}/unifi_sysvinit_all.deb
 
 # Set the product installation directory
