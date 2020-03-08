@@ -5,6 +5,7 @@ FROM adoptopenjdk:8-jre-openj9
 
 ARG UNIFI_VER=5.12.66-2a7dc90946
 ARG UNIFI_URL=https://dl.ui.com/unifi/${UNIFI_VER}/unifi_sysvinit_all.deb
+ARG UNIFI_USER=10017
 
 # Set the product installation directory
 ENV BASEDIR=/usr/lib/unifi \
@@ -21,8 +22,8 @@ COPY log4j2.xml /usr/lib/unifi/
 COPY scripts/*.sh /
 
 # https://github.com/moby/moby/issues/38710
-# Set permissions on folders and /etc/passwd
-RUN chmod g=u /etc/passwd \
+# Set permissions on folders, add default user to /etc/passwd
+RUN echo "unifi:x:${UNIFI_USER}:0:unifi:${BASEDIR}:/sbin/nologin" >> /etc/passwd \
  && mkdir -p ${DATADIR} \
  && chmod g=u ${DATADIR} \
  && ln -s ${DATADIR} ${BASEDIR}/data \
@@ -54,7 +55,7 @@ HEALTHCHECK --start-period=2m --interval=1m --timeout=15s --retries=3 \
         CMD ["/healthcheck.sh"]
 
 # Containers should NOT run as root
-USER 999
+USER ${UNIFI_USER}:0
 WORKDIR ${BASEDIR}
 VOLUME ${DATADIR}
 ENTRYPOINT ["/entrypoint.sh"]

@@ -1,13 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  Extracted from /usr/lib/unifi/lib/ace.jar
+  PROTIP: Rename to ace.jar.zip then open with jadx-gui
+-->
+
 <Configuration>
   <Appenders>
-    <Console name="console" target="SYSTEM_OUT">
+    <Console name="Console" target="SYSTEM_OUT">
       <PatternLayout charset="UTF-8" pattern="[%d{ISO8601}] &lt;%t&gt; %-5p %-6c{1} - %m%n" />
     </Console>
+<!--
+    <InMemoryAppender name="InMemoryAppender" activatedLogging="false">
+      <PatternLayout pattern="[%d{ISO8601}] &lt;%t&gt; %-5p %-6c{1} - %m%n" />
+    </InMemoryAppender>
+    <RollingFile name="server_log" fileName="logs/server.log" filePattern="logs/server.log.%i">
+      <PatternLayout pattern="[%d{ISO8601}] &lt;%t&gt; %-5p %-6c{1} - %m%n" />
+      <SizeBasedTriggeringPolicy size="10 MB"/>
+      <DefaultRolloverStrategy max="3" fileIndex="min" />
+    </RollingFile>
+-->
   </Appenders>
   <Loggers>
     <Root level="INFO">
-      <AppenderRef ref="console" />
+      <AppenderRef ref="Console" />
+<!--
+      <AppenderRef ref="InMemoryAppender" />
+      <AppenderRef ref="server_log" />
+-->
     </Root>
     <Logger name="org.apache.log4j.xml" level="info" />
     <Logger name="java" level="ERROR" />
@@ -20,7 +40,7 @@
     <Logger name="com.codahale" level="ERROR" />
     <Logger name="org.apache.tomcat" level="ERROR" />
     <Logger name="org.apache.commons" level="WARN" />
-    <Logger name="org.apache.catalina" level="WARN" />
+    <Logger name="org.apache.catalina" level="ERROR" />
     <Logger name="com.mongodb" level="ERROR" />
     <Logger name="org.mongodb" level="ERROR" />
 
@@ -32,5 +52,6 @@
 
     <Logger name="com.netflix.servo" level="INFO" />
     <Logger name="com.amazonaws.internal" level="WARN" />
+    <Logger name="springfox" level="WARN" />
   </Loggers>
 </Configuration>

@@ -1,11 +1,23 @@
 #!/bin/bash
 
-MAX_WAIT=10
-HTTP_CODE=$(curl -s --connect-timeout 1 -o /dev/null -w "%{HTTP_CODE}" http://localhost:8080/status)
-for i in `seq 1 ${MAX_WAIT}` ; do
-    if [ "${HTTP_CODE}" != "200" ]; then
+get_status() {
+    curl \
+        --connect-timeout 1 \
+        --output /dev/null \
+        --silent \
+        --write-out "%{HTTP_CODE}" \
+        http://localhost:8080/status
+}
+
+COUNT=10
+HTTP_CODE=$(get_status)
+for COUNT in `seq 1 ${COUNT}`
+do
+    echo "HTTP_CODE: ${HTTP_CODE}"
+    if [[ "${HTTP_CODE}" != "200" ]]
+    then
         sleep 1
-        HTTP_CODE=$(curl -s --connect-timeout 1 -o /dev/null -w "%{HTTP_CODE}" http://localhost:8080/status)
+        HTTP_CODE=$(get_status)
     else
         break
     fi

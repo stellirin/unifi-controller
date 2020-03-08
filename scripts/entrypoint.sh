@@ -1,7 +1,13 @@
 #!/bin/bash
 
+
+# Ensure files are written as writable by all users in the root group
+umask 002
+
 JVM_EXTRA_OPTS=
 JVM_MAX_HEAP_SIZE=${JVM_MAX_HEAP_SIZE:-"1024M"}
+
+# Generate the MongoDB connection URI
 if [ -z "${MONGO_DB_URI}" ]
 then
     if [ -n "${MONGO_DB_USER}" ] && [ -n "${MONGO_DB_PASS}" ]
@@ -11,20 +17,12 @@ then
         MONGO_DB_URI=mongodb://${MONGO_DB_HOST:-"localhost"}:${MONGO_DB_PORT:-"27017"}
     fi
 fi
+
 MONGO_DB_NAME=${MONGO_DB_NAME:-"unifi"}
 MONGO_DB_STAT_URI=${MONGO_DB_STAT_URI:-"${MONGO_DB_URI}"}
 UNIFI_HTTPS_PORT=${UNIFI_HTTPS_PORT:-"8443"}
 
-# OpenShift requires ability to run as arbitrary user ID
-set_user_id() {
-    local USER_NAME=unifi
-    if ! whoami &> /dev/null; then
-        if [ -w /etc/passwd ]; then
-            echo "${USER_NAME}:x:$(id -u):0:${USER_NAME} user:${BASEDIR}:/sbin/nologin" >> /etc/passwd
-        fi
-    fi
-}
-
+# Configure TLS
 set_tls_keystore() {
     if [ -n "${UNIFI_TLS_FULLCHAIN}" ] && [ -n "${UNIFI_TLS_PRIVKEY}" ]
     then
@@ -150,8 +148,6 @@ unifi_stop() {
     # Container exit code is UniFi exit code
     exit $?
 }
-
-set_user_id
 
 set_tls_keystore
 

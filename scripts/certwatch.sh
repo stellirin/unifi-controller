@@ -8,7 +8,7 @@ sha256sum ${UNIFI_TLS_FULLCHAIN} ${UNIFI_TLS_PRIVKEY} > /tmp/cert.hash
 # No need for frequent checks, TLS certificates rarely change
 while [[ "${HASH_CHECK}" == "0" ]]
 do
-    sleep 1d
+    sleep 1h
     sha256sum --check --status /tmp/cert.hash
     HASH_CHECK=$?
 done

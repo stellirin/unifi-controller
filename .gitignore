@@ -1,3 +1,5 @@
 .env
+extract/*
 controller-*.tar.gz
 mongodb-*.tar.gz
+unifi.*.deb
