@@ -64,6 +64,12 @@ Port of the MongoDB installation.
 
 Default value is `27017`.
 
+### `MONGO_DB_NAME`
+
+The database name on the MongoDB installation.
+
+Default value is `unifi`.
+
 ### `MONGO_DB_USER`
 
 Username for authentication on the MongoDB installation.
@@ -87,12 +93,6 @@ Default value will be generated as `mongodb://localhost:27017` unless other Mong
 Full URI to the MongoDB stat installation. For more complex installations. It can be a single host or multiple hosts in a Replica Set.
 
 Default is to take the same value as `MONGO_DB_URI`.
-
-### `MONGO_DB_NAME`
-
-The database name on the MongoDB installation.
-
-Default value is `unifi`.
 
 ### `UNIFI_HTTPS_PORT`
 
@@ -127,3 +127,13 @@ No default value.
 Provide additional JVM options.
 
 No default value.
+
+## Container Secrets
+
+As an alternative to passing sensitive information via environment variables, `_FILE` may be appended to some of the previously listed environment variables, causing the initialization script to load the values for those variables from files present in the container. In particular, this can be used to load passwords from secrets stored in `/run/secrets/<secret_name>` files. For example:
+
+```sh
+$ docker run --name unifi-controller -e MONGO_DB_PASS_FILE=/run/secrets/mongo-db-password -d stellirin/unifi-controller
+```
+
+Currently, this is only supported for `MONGO_DB_HOST`, `MONGO_DB_PORT`, `MONGO_DB_NAME`, `MONGO_DB_USER`, `MONGO_DB_PASS`, `MONGO_DB_URI`, and `MONGO_DB_STAT_URI`.

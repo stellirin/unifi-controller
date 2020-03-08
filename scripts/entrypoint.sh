@@ -1,26 +1,26 @@
 #!/bin/bash
 
-
-# Ensure files are written as writable by all users in the root group
-umask 002
-
-JVM_EXTRA_OPTS=
-JVM_MAX_HEAP_SIZE=${JVM_MAX_HEAP_SIZE:-"1024M"}
-
-# Generate the MongoDB connection URI
-if [ -z "${MONGO_DB_URI}" ]
-then
-    if [ -n "${MONGO_DB_USER}" ] && [ -n "${MONGO_DB_PASS}" ]
-    then
-        MONGO_DB_URI=mongodb://${MONGO_DB_USER}:${MONGO_DB_PASS}@${MONGO_DB_HOST:-"localhost"}:${MONGO_DB_PORT:-"27017"}
-    else
-        MONGO_DB_URI=mongodb://${MONGO_DB_HOST:-"localhost"}:${MONGO_DB_PORT:-"27017"}
+# usage: file_env VAR [DEFAULT]
+#    ie: file_env 'XYZ_DB_PASSWORD' 'example'
+# (will allow for "$XYZ_DB_PASSWORD_FILE" to fill in the value of
+#  "$XYZ_DB_PASSWORD" from a file, especially for Docker's secrets feature)
+file_env() {
+    local var="$1"
+    local fileVar="${var}_FILE"
+    local def="${2:-}"
+    if [ "${!var:-}" ] && [ "${!fileVar:-}" ]; then
+        echo >&2 "error: both $var and $fileVar are set (but are exclusive)"
+        exit 1
     fi
-fi
-
-MONGO_DB_NAME=${MONGO_DB_NAME:-"unifi"}
-MONGO_DB_STAT_URI=${MONGO_DB_STAT_URI:-"${MONGO_DB_URI}"}
-UNIFI_HTTPS_PORT=${UNIFI_HTTPS_PORT:-"8443"}
+    local val="$def"
+    if [ "${!var:-}" ]; then
+        val="${!var}"
+    elif [ "${!fileVar:-}" ]; then
+        val="$(< "${!fileVar}")"
+    fi
+    export "$var"="$val"
+    unset "$fileVar"
+}
 
 # Configure TLS
 set_tls_keystore() {
@@ -149,13 +149,39 @@ unifi_stop() {
     exit $?
 }
 
+# Ensure files are written as writable by all users in the root group
+umask 002
+
+JVM_EXTRA_OPTS=
+JVM_MAX_HEAP_SIZE=${JVM_MAX_HEAP_SIZE:-"1024M"}
+
+file_env 'MONGO_DB_HOST' 'localhost'
+file_env 'MONGO_DB_PORT' '27017'
+file_env 'MONGO_DB_NAME' 'unifi'
+file_env 'MONGO_DB_USER'
+file_env 'MONGO_DB_PASS'
+file_env 'MONGO_DB_URI'
+
+# Generate the MongoDB connection URI
+if [ -z "${MONGO_DB_URI}" ]
+then
+    if [ -n "${MONGO_DB_USER}" ] && [ -n "${MONGO_DB_PASS}" ]
+    then
+        MONGO_DB_URI=mongodb://${MONGO_DB_USER}:${MONGO_DB_PASS}@${MONGO_DB_HOST}:${MONGO_DB_PORT}
+    else
+        MONGO_DB_URI=mongodb://${MONGO_DB_HOST}:${MONGO_DB_PORT}
+    fi
+fi
+
+file_env 'MONGO_DB_STAT_URI' "${MONGO_DB_URI}"
+
 set_tls_keystore
 
 set_system_property "db.mongo.local=false"
 set_system_property "db.mongo.uri=${MONGO_DB_URI}"
 set_system_property "statdb.mongo.uri=${MONGO_DB_STAT_URI}"
 set_system_property "unifi.db.name=${MONGO_DB_NAME}"
-set_system_property "unifi.https.port=${UNIFI_HTTPS_PORT}"
+set_system_property "unifi.https.port=${UNIFI_HTTPS_PORT:-"8443"}"
 
 set_jvm_extra_opts "file.encoding=UTF-8"
 set_jvm_extra_opts "java.awt.headless=true"
