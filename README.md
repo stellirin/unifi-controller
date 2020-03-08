@@ -37,7 +37,7 @@ This project is not an official container image, nor is it associated with Ubiqu
 
 Motivation for this project comes from the limitations of the source DEB. Specifically, the DEB is restricted to use MongoDB v3.4 because of how the UniFi scripts connect to a locally installed DB. However, UniFi runs perfectly fine on MongoDB v4.0 when connecting to a 'remote' MongoDB installation (i.e. via URI instead of socket).
 
-By default the controller will generate untrusted TLS certificates. This container can also use trusted certificates, for example from Let's Encrypt. The container will also watch any provided certificates for change and trigger a restart.
+By default the controller will generate untrusted TLS certificates. This container can also use trusted certificates, for example from Let's Encrypt. The container will also watch any provided certificates for changes and trigger a restart.
 
 **\* \* \* NOTE: this project is still a WIP \* \* \***
 
@@ -46,28 +46,7 @@ By default the controller will generate untrusted TLS certificates. This contain
 
 # How to use this image
 
-This container image must be used in conjunction with an existing MongoDB installation. The simplest method is to use a MongoDB container image.
-
-## Single-node Docker Compose
-
-Use the file from `Appendix A`:
-```
-docker-compose -f appendix-a.yaml up -d
-```
-
-## Multi-node Docker Compose
-
-Use the files from `Appendix A` and `Appendix B`:
-```
-docker-compose -f appendix-a.yaml -f appendix-b.yaml up -d
-```
-
-Initialize the replica set:
-```
-docker-compose -f appendix-a.yaml -f appendix-b.yaml exec mongo0 mongo
-```
-
-Paste in the contents of `Appendix C`.
+This container image must be used in conjunction with an existing MongoDB installation. The simplest method is to use a MongoDB container image. See the [examples folder](https://github.com/stellirin/unifi-controller/tree/master/examples) for tested methods of running this image.
 
 ## Environment Variables
 
@@ -148,134 +127,3 @@ No default value.
 Provide additional JVM options.
 
 No default value.
-
-# Appendix A: Single-node Docker Compose
-
-```yaml
-version: '3.7'
-
-x-mongo-service-template:
-  &default-mongo-service
-  image: mongo:4.0
-  networks:
-    - unifi
-  restart: always
-
-x-mongo-volume-template:
-  &default-mongo-volume
-  type: volume
-  target: /data/db
-
-networks:
-  unifi:
-    name: unifi
-
-volumes:
-  db0:
-    name: unifi_db0
-  unifi:
-    name: unifi_data
-
-services:
-  mongo0:
-    << : *default-mongo-service
-    volumes:
-      - source: db0
-        << : *default-mongo-volume
-
-  unifi:
-    build: .
-    image: "stellirin/unifi-controller:latest"
-    hostname: unifi
-    depends_on:
-      - mongo0
-    networks:
-      - unifi
-    ports:
-      - "1900:1900/udp"   # Controller discovery
-      - "3478:3478/udp"   # STUN
-      - "6789:6789/tcp"   # Speed test
-      - "8080:8080/tcp"   # Device/ controller comm.
-      - "8443:8443/tcp"   # Controller GUI/API as seen in a web browser
-      - "8880:8880/tcp"   # HTTP portal redirection
-      - "8843:8843/tcp"   # HTTPS portal redirection
-      - "10001:10001/udp" # AP discovery
-    restart: always
-    volumes:
-      - type: volume
-        source: unifi
-        target: /var/lib/unifi
-    environment:
-      DB_MONGO_HOST: "mongo0"
-```
-
-# Appendix B: Multi-node Docker Compose
-
-```yaml
-version: '3.7'
-
-x-mongo-service-template:
-  &default-mongo-service
-  image: mongo:4.0
-  networks:
-    - unifi
-  restart: always
-
-x-mongo-volume-template:
-  &default-mongo-volume
-  type: volume
-  target: /data/db
-
-x-mongo-etrypoint-template:
-  &default-mongo-entrypoint
-  entrypoint: [
-    "/usr/bin/mongod",
-    "--bind_ip_all",
-    "--replSet", "unifi"
-  ]
-
-volumes:
-  db1:
-    name: unifi_db1
-  db2:
-    name: unifi_db2
-
-services:
-  mongo0:
-    << : *default-mongo-entrypoint
-
-  mongo1:
-    << : *default-mongo-service
-    << : *default-mongo-entrypoint
-    volumes:
-      - source: db1
-        << : *default-mongo-volume
-
-  mongo2:
-    << : *default-mongo-service
-    << : *default-mongo-entrypoint
-    volumes:
-      - source: db2
-        << : *default-mongo-volume
-
-  unifi:
-    depends_on:
-      - mongo0
-      - mongo1
-      - mongo2
-    environment:
-      DB_MONGO_URI: "mongodb://mongo0,mongo1,mongo2/unifi?replicaSet=unifi"
-```
-
-# Appendix C: MongoDB ReplicaSet
-
-```json
-rs.initiate({
-    "_id":"unifi",
-    "members":[
-        { "_id":0, "host":"mongo0:27017" },
-        { "_id":1, "host":"mongo1:27017" },
-        { "_id":2, "host":"mongo2:27017" }
-    ]
-})
-```

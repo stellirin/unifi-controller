@@ -55,7 +55,7 @@ services:
       # Advanced gateway configuration
       # - type: bind
       #   read_only: true
-      #   source: ./unifi/config.gateway.json
+      #   source: ./controller/config.gateway.json
       #   target: /var/lib/unifi/sites/default/config.gateway.json
     environment:
       MONGO_DB_HOST: ${MONGO_DB_HOST:-mongodb}
