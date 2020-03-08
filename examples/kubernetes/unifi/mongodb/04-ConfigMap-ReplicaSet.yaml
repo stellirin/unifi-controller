@@ -1,0 +1,69 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  namespace: unifi
+  name: unifi-mongodb-replicaset-configmap
+
+data:
+
+  # Job to wait for all instances then init the ReplicaSet if it doesn't already exist
+  ENTRYPOINT_RS_SH: |
+    #!/bin/bash
+
+    PODS=(
+      "mongodb-0"
+      "mongodb-1"
+      "mongodb-2"
+    )
+    PORT="27017"
+    SERVICE="mongodb"
+
+    MONGO_ARGS=(
+        --quiet
+        --port ${PORT}
+        --username $(< ${MONGO_INITDB_ROOT_USERNAME_FILE})
+        --password $(< ${MONGO_INITDB_ROOT_PASSWORD_FILE})
+    )
+
+    # Ensure all MongoDB pods are up
+    echo "Waiting for all MongoDB pods to become avaialble."
+    while [ "${PODS_UP}" != "${#PODS[@]}" ]
+    do
+        sleep 1
+        let PODS_UP=0
+        for POD in ${PODS[@]}
+        do
+            MONGO_DB_STATUS=0
+            MONGO_DB_STATUS=$(mongo ${MONGO_ARGS[@]} --host ${POD}.${SERVICE} --eval "JSON.stringify(db.stats())" | jq -r '.ok' 2> /dev/null)
+            if [ "${MONGO_DB_STATUS}" = "1" ]
+            then
+                echo "MongoDB pod '${POD}' is avaialble!"
+                let PODS_UP=${PODS_UP}+1
+            fi
+        done
+    done
+    echo "All MongoDB pods have become avaialble!"
+
+    # Check if we already have a ReplicaSet
+    MONGO_RS_STATUS=$(mongo ${MONGO_ARGS[@]} --host ${PODS[0]}.${SERVICE} --eval "JSON.stringify(rs.status())" | jq -r '.ok')
+    if [ "${MONGO_RS_STATUS}" == "1" ]
+    then
+        echo "ReplicaSet already exists! nothing to do."
+        exit 0
+    fi
+
+    # All nodes are up but give the them time to settle
+    sleep 5
+
+    MEMBERS="{ _id: 0, host: '${PODS[0]}.${SERVICE}:${PORT}' }"
+    for (( i=1; i<${#PODS[@]}; i++ ))
+    do
+        MEMBERS="${MEMBERS}, { _id: $i, host: '${PODS[$i]}.${SERVICE}:${PORT}' }"
+    done
+
+    mongo ${MONGO_ARGS[@]} \
+        --host ${PODS[0]}.${SERVICE} \
+        --eval  "rs.initiate({
+                    _id: '${MONGO_INITDB_DATABASE}',
+                    members: [ ${MEMBERS} ]
+                })"

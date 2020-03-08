@@ -1,0 +1,96 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: unifi
+  name: controller
+  labels:
+    app: controller
+
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: controller
+
+  template:
+    metadata:
+      labels:
+        app: controller
+    spec:
+
+      containers:
+        - name: controller
+          image: stellirin/unifi-controller:stable
+          ports:
+            - name: discoverable
+              containerPort: 1900
+              protocol: UDP
+            - name: stun
+              containerPort: 3478
+              protocol: UDP
+            - name: speed-test
+              containerPort: 6789
+              protocol: TCP
+            - name: communication
+              containerPort: 8080
+              protocol: TCP
+            - name: controller
+              containerPort: 8443
+              protocol: TCP
+            - name: http-redirect
+              containerPort: 8880
+              protocol: TCP
+            - name: https-redirect
+              containerPort: 8843
+              protocol: TCP
+            - name: discovery
+              containerPort: 10001
+              protocol: UDP
+          envFrom:
+            - configMapRef:
+                name: unifi-controller-configmap
+          volumeMounts:
+            # MongoDB credentials
+            - name: credentials
+              mountPath: /run/secrets/mongodb
+            # UniFi Controller storage volume
+            - name: data
+              mountPath: /var/lib/unifi
+            - name: entrypoint
+              mountPath: /entrypoint.sh
+              subPath: entrypoint.sh
+          #   # UniFi Controller custom configuration
+          #   - name: unifi-config-gateway-json
+          #     mountPath: /var/lib/unifi/sites/default/config.gateway.json
+          # resources:
+          #   requests:
+          #     cpu: 50m
+          #     memory: 256Mi
+          #   limits:
+          #     cpu: 250m
+          #     memory: 512Mi
+
+      volumes:
+        # MongoDB credentials
+        - name: credentials
+          secret:
+            secretName: unifi-mongodb-user-secret
+            defaultMode: 0444
+            items:
+              - key:  MONGO_DB_USER
+                path: MONGO_DB_USER
+              - key:  MONGO_DB_PASS
+                path: MONGO_DB_PASS
+
+        # MongoDB init scripts
+        - name: entrypoint
+          configMap:
+            name: unifi-controller-configmap
+            defaultMode: 0755
+            items:
+              - key: ENTRYPOINT
+                path: entrypoint.sh
+
+        # MongoDB storage volume
+        - name: data
+          emptyDir: {}

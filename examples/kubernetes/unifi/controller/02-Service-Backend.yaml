@@ -1,0 +1,56 @@
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: unifi
+  name: controller-backend-tcp
+  labels:
+    app: controller
+
+spec:
+  type: LoadBalancer
+  selector:
+    app: controller
+  ports:
+  - name: speed-test
+    protocol: TCP
+    port: 6789
+    targetPort: speed-test
+  - name: communication
+    protocol: TCP
+    port: 8080
+    targetPort: communication
+  - name: http-redirect
+    protocol: TCP
+    port: 8880
+    targetPort: http-redirect
+  - name: https-redirect
+    protocol: TCP
+    port: 8843
+    targetPort: https-redirect
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: unifi
+  name: controller-backend-udp
+  labels:
+    app: controller
+
+spec:
+  type: LoadBalancer
+  selector:
+    app: controller
+  ports:
+  - name: discoverable
+    protocol: UDP
+    port: 1900
+    targetPort: discoverable
+  - name: stun
+    protocol: UDP
+    port: 3478
+    targetPort: stun
+  - name: discovery
+    protocol: UDP
+    port: 10001
+    targetPort: discovery

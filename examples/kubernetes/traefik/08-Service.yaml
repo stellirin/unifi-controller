@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: traefik
+  name: traefik
+
+spec:
+  type: LoadBalancer
+  selector:
+    app: traefik
+  ports:
+    # Standard ports
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: http
+    - name: https
+      port: 443
+      protocol: TCP
+      targetPort: https

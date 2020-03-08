@@ -155,11 +155,12 @@ umask 002
 JVM_EXTRA_OPTS=
 JVM_MAX_HEAP_SIZE=${JVM_MAX_HEAP_SIZE:-"1024M"}
 
-file_env 'MONGO_DB_HOST' 'localhost'
-file_env 'MONGO_DB_PORT' '27017'
-file_env 'MONGO_DB_NAME' 'unifi'
 file_env 'MONGO_DB_USER'
 file_env 'MONGO_DB_PASS'
+file_env 'MONGO_DB_HOST' 'localhost'
+file_env 'MONGO_DB_PORT' '27017'
+
+file_env 'MONGO_DB_NAME' 'unifi'
 file_env 'MONGO_DB_URI'
 
 # Generate the MongoDB connection URI

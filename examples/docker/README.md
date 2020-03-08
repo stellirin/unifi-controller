@@ -1,4 +1,4 @@
-# UniFi Controller in Docker
+# UniFi Controller on Docker
 
 Add the relevant environment variables to a '`.env`' file in this folder to customize the Docker Compose behaviour. Example:
 

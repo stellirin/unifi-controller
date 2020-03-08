@@ -1,0 +1,119 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  namespace: unifi
+  name: mongodb
+  labels:
+    app: mongodb
+
+spec:
+  replicas: 3
+  updateStrategy:
+    type: RollingUpdate
+  serviceName: mongodb
+  selector:
+    matchLabels:
+      app: mongodb
+
+  template:
+    metadata:
+      labels:
+        app: mongodb
+    spec:
+
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                      - mongodb
+              topologyKey: "kubernetes.io/hostname"
+
+      initContainers:
+        - name: mongo-init
+          image: mongo:4.0
+          command: [
+            "/entrypoint.sh",
+          ]
+          args: [
+            "mongod",
+          ]
+          envFrom:
+            - configMapRef:
+                name: unifi-mongodb-configmap
+          volumeMounts:
+            # MongoDB credentials
+            - name: credentials
+              mountPath: /run/secrets/mongodb
+            # MongoDB init scripts
+            - name: initdb
+              mountPath: /docker-entrypoint-initdb.d/01-admin.sh
+              subPath: 01-admin.sh
+            - name: initdb
+              mountPath: /entrypoint.sh
+              subPath: entrypoint.sh
+            # MongoDB storage volume
+            - name: data
+              mountPath: /data/db
+
+      containers:
+        - name: mongo
+          image: mongo:4.0
+          args: [
+            "mongod",
+            "--bind_ip_all",
+            "--keyFile", "/data/db/unifi-mongodb.key",
+            "--replSet", "unifi"
+          ]
+          ports:
+            - name: mongo
+              containerPort: 27017
+              protocol: TCP
+          volumeMounts:
+            # MongoDB storage volume
+            - name: data
+              mountPath: /data/db
+
+      volumes:
+        # MongoDB credentials
+        - name: credentials
+          projected:
+            defaultMode: 0444
+            sources:
+              - secret:
+                  name: unifi-mongodb-admin-secret
+                  items:
+                    - key:  MONGO_INITDB_ROOT_USERNAME
+                      path: MONGO_INITDB_ROOT_USERNAME
+                    - key:  MONGO_INITDB_ROOT_PASSWORD
+                      path: MONGO_INITDB_ROOT_PASSWORD
+              - secret:
+                  name: unifi-mongodb-user-secret
+                  items:
+                    - key:  MONGO_DB_USER
+                      path: MONGO_DB_USER
+                    - key:  MONGO_DB_PASS
+                      path: MONGO_DB_PASS
+              - secret:
+                  name: unifi-mongodb-keyfile-secret
+                  items:
+                    - key:  MONGODB_KEYFILE
+                      path: MONGODB_KEYFILE
+
+        # MongoDB init scripts
+        - name: initdb
+          configMap:
+            name: unifi-mongodb-initdb-configmap
+            defaultMode: 0555
+            items:
+              - key: 01_ADMIN_SH
+                path: 01-admin.sh
+              - key: ENTRYPOINT_INIT_SH
+                path: entrypoint.sh
+
+        # MongoDB storage volume
+        - name: data
+          emptyDir: {}

@@ -1,0 +1,54 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  namespace: unifi
+  name: unifi-mongodb-initdb-configmap
+
+data:
+
+  # Script to init the MongoDB database
+  01_ADMIN_SH: |
+    #!/bin/bash
+
+    MONGO_DB_USER="$(< ${MONGO_DB_USER_FILE})"
+    MONGO_DB_PASS="$(< ${MONGO_DB_PASS_FILE})"
+
+    create_user() {
+        mongo admin \
+            --host localhost \
+            --eval "db.createUser($1);"
+    }
+
+    create_user "{
+        user: '${MONGO_DB_USER}',
+        pwd:  '${MONGO_DB_PASS}',
+        roles: [
+            {
+                role: 'readWrite',
+                db:   '${MONGO_INITDB_DATABASE}'
+            },
+            {
+                role: 'readWrite',
+                db:   '${MONGO_INITDB_DATABASE}_stat'
+            }
+        ]
+    }"
+
+  # Hack to allow the regular MongoDB container to act as an init container
+  ENTRYPOINT_INIT_SH: |
+    #!/bin/bash
+
+    # Remove the final exec from the entrypoint
+    sed -i.bak \
+      -e 's|^exec "\$\@"$|exit 0|g' /usr/local/bin/docker-entrypoint.sh
+
+    # Execute the entrypoint, it will eventually exit
+    ./usr/local/bin/docker-entrypoint.sh $@
+
+    # Copy the MongoDB key to the DB folder,
+    # MongoDB will otherwise complain about too open permissions
+    cat /run/secrets/mongodb/MONGODB_KEYFILE > /data/db/unifi-mongodb.key
+    chown mongodb:mongodb /data/db/unifi-mongodb.key
+    chmod 400 /data/db/unifi-mongodb.key
+
+    exit 0
