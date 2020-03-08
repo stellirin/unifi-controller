@@ -1,0 +1,64 @@
+version: '3.7'
+
+networks:
+  default:
+    name: unifi
+
+volumes:
+  mongodb:
+    name: unifi-mongodb
+  controller:
+    name: unifi-controller
+
+services:
+
+  mongodb:
+    image: mongo:4.0
+    container_name: unifi-mongodb
+    volumes:
+      # MongoDB init scripts
+      - type: bind
+        read_only: true
+        source: ./mongodb/initdb.d
+        target: /docker-entrypoint-initdb.d
+      # MongoDB storage volume
+      - type: volume
+        source: mongodb
+        target: /data/db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD:-admin}
+      MONGO_INITDB_DATABASE: ${MONGO_INITDB_DATABASE:-unifi}
+      # Not used by the MongoDB image but our custom init scripts
+      MONGO_DB_USER: ${MONGO_DB_USER:-unifi}
+      MONGO_DB_PASS: ${MONGO_DB_PASS:-unifi}
+
+  controller:
+    depends_on:
+      - mongodb
+    image: stellirin/unifi-controller:${CONTROLLER_IMAGE_TAG:-stable}
+    container_name: unifi-controller
+    ports:
+      - "1900:1900/udp"
+      - "3478:3478/udp"
+      - "6789:6789/tcp"
+      - "8080:8080/tcp"
+      - "8443:8443/tcp"
+      - "8843:8843/tcp"
+      - "8880:8880/tcp"
+      - "10001:10001/udp"
+    volumes:
+      # Controller storage volume
+      - type: volume
+        source: controller
+        target: /var/lib/unifi
+      # Advanced gateway configuration
+      # - type: bind
+      #   read_only: true
+      #   source: ./unifi/config.gateway.json
+      #   target: /var/lib/unifi/sites/default/config.gateway.json
+    environment:
+      MONGO_DB_HOST: ${MONGO_DB_HOST:-mongodb}
+      MONGO_DB_PORT: ${MONGO_DB_PORT:-27017}
+      MONGO_DB_USER: ${MONGO_DB_USER:-unifi}
+      MONGO_DB_PASS: ${MONGO_DB_PASS:-unifi}
