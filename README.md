@@ -82,6 +82,12 @@ Password for authentication on the MongoDB installation.
 
 No default value.
 
+### `MONGO_DB_ARGS`
+
+Additional MongoDB connection arguments.
+
+No default value.
+
 ### `MONGO_DB_URI`
 
 Full URI for the MongoDB installation. For more complex installations. It can be a single host or multiple hosts in a Replica Set.

@@ -171,6 +171,11 @@ then
     else
         MONGO_DB_URI=mongodb://${MONGO_DB_HOST}:${MONGO_DB_PORT}
     fi
+
+    if [ -n "${MONGO_DB_ARGS}" ]
+    then
+        MONGO_DB_URI=${MONGO_DB_URI}/?${MONGO_DB_ARGS}
+    fi
 fi
 
 file_env 'MONGO_DB_STAT_URI' "${MONGO_DB_URI}"
