@@ -13,14 +13,14 @@ volumes:
 services:
 
   mongodb:
-    image: mongo:4.0
+    image: mongo:4.2
     container_name: unifi-mongodb
     volumes:
       # MongoDB init scripts
       - type: bind
         read_only: true
-        source: ./mongodb/initdb.d
-        target: /docker-entrypoint-initdb.d
+        source: ./mongodb/initdb.d/01-admin.sh
+        target: /docker-entrypoint-initdb.d/01-admin.sh
       # MongoDB storage volume
       - type: volume
         source: mongodb

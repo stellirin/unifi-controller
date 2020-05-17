@@ -1,11 +1,12 @@
 # Supported tags and respective `Dockerfile` links
 
 - [`latest`](https://github.com/stellirin/unifi-controller/blob/master/Dockerfile)
-- [`stable, 5.12, 5.12.35`](https://github.com/stellirin/unifi-controller/blob/5.12.35/Dockerfile)
+- [`stable, 5.12, 5.12.72`](https://github.com/stellirin/unifi-controller/blob/5.12.72/Dockerfile)
 
 NOTE: `latest` may contain a Release Candidate build. If you wish for stability use the `stable` tag!
 
 # Unsupported tags
+- [`5.12.22`](https://github.com/stellirin/unifi-controller/blob/5.12.35/Dockerfile)
 - [`5.12.22`](https://github.com/stellirin/unifi-controller/blob/5.12.22/Dockerfile)
 - [`5.11.50`](https://github.com/stellirin/unifi-controller/blob/5.11.50/Dockerfile)
 - [`5.11.47`](https://github.com/stellirin/unifi-controller/blob/5.11.47/Dockerfile)
