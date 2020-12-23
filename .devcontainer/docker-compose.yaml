@@ -1,0 +1,43 @@
+version: "3.8"
+
+volumes:
+  extensions:
+
+services:
+  vscode:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    user: vscode
+    environment:
+      GITHUB_TOKEN:
+      TZ: "Europe/Prague"
+    volumes:
+      - type: bind
+        source: ../
+        target: /workspace
+      # According to docs it is not safe to share the extensions folder
+      - type: volume
+        source: extensions
+        target: /home/vscode/.vscode-server/extensions
+      # Indirect socket mount for rootless access to Docker (see installation scripts)
+      - type: bind
+        source: /var/run/docker.sock
+        target: /var/run/docker-host.sock
+
+      # Shared working environment config with host
+      - type: bind
+        source: ~/.ssh
+        target: /home/vscode/.ssh
+      - type: bind
+        source: ~/.zshrc
+        target: /home/vscode/.zshrc
+      - type: bind
+        source: ~/.zsh_history
+        target: /home/vscode/.zsh_history
+      - type: bind
+        source: ~/.oh-my-zsh/custom/themes/powerlevel10k
+        target: /home/vscode/.oh-my-zsh/custom/themes/powerlevel10k
+      - type: bind
+        source: ~/.p10k.zsh
+        target: /home/vscode/.p10k.zsh
