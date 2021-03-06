@@ -2,10 +2,10 @@
 
 <!--
   Extracted from /usr/lib/unifi/lib/ace.jar
-  PROTIP: Rename to ace.jar.zip then open with jadx-gui
+  PROTIP: unzip usr/lib/unifi/lib/ace.jar
 -->
 
-<Configuration>
+<Configuration packages="com.ubnt.service.trace.logerror">
   <Appenders>
     <Console name="Console" target="SYSTEM_OUT">
       <PatternLayout charset="UTF-8" pattern="[%d{ISO8601}] &lt;%t&gt; %-5p %-6c{1} - %m%n" />
@@ -20,6 +20,15 @@
       <DefaultRolloverStrategy max="3" fileIndex="min" />
     </RollingFile>
 -->
+    <AnalyticsAppender name="AnalyticsAppender">
+      <ReportBurstFilter>
+        <ReportClock />
+      </ReportBurstFilter>
+      <ReportSender url="https://trace.svc.ui.com/traces">
+        <ReportClock />
+      </ReportSender>
+      <ReportClock />
+    </AnalyticsAppender>
   </Appenders>
   <Loggers>
     <Root level="INFO">
@@ -28,6 +37,7 @@
       <AppenderRef ref="InMemoryAppender" />
       <AppenderRef ref="server_log" />
 -->
+      <AppenderRef ref="AnalyticsAppender" level="ERROR" />
     </Root>
     <Logger name="org.apache.log4j.xml" level="info" />
     <Logger name="java" level="ERROR" />

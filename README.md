@@ -4,16 +4,19 @@ The UniFi® Software-Defined Networking (SDN) platform is an end-to-end system o
 
 ## Supported tags and respective `Dockerfile` links
 
-- [`latest`](https://github.com/stellirin/unifi-controller/blob/master/Dockerfile)
-- [`stable, 5.14, 5.14.23`](https://github.com/stellirin/unifi-controller/blob/5.12.72/Dockerfile)
+> The 6.0.x and 6.1.x branches are currently not supported here, the transition to a new UI has had many regressions.
 
-NOTE: `latest` may contain a Release Candidate build. If you wish for stability use the `stable` tag!
+- [`latest`](https://github.com/stellirin/unifi-controller/blob/master/Dockerfile)
+- [`stable, 5.14, 5.14.23`](https://github.com/stellirin/unifi-controller/blob/5.14.23/Dockerfile)
+
+NOTE: `latest` may contain a beta release. If you wish for stability use the `stable` tag!
 
 ## Unsupported tags
 
-- [`5.13, 5.13.32`](https://github.com/stellirin/unifi-controller/blob/5.12.35/Dockerfile)
-- [`5.13.29`](https://github.com/stellirin/unifi-controller/blob/5.12.35/Dockerfile)
-- [`5.12, 5.12.72`](https://github.com/stellirin/unifi-controller/blob/5.12.35/Dockerfile)
+- [`5.14, 5.14.23`](https://github.com/stellirin/unifi-controller/blob/5.14.23/Dockerfile)
+- [`5.13, 5.13.32`](https://github.com/stellirin/unifi-controller/blob/5.13.32/Dockerfile)
+- [`5.13.29`](https://github.com/stellirin/unifi-controller/blob/5.13.29/Dockerfile)
+- [`5.12, 5.12.72`](https://github.com/stellirin/unifi-controller/blob/5.12.72/Dockerfile)
 - [`5.12.35`](https://github.com/stellirin/unifi-controller/blob/5.12.35/Dockerfile)
 - [`5.12.22`](https://github.com/stellirin/unifi-controller/blob/5.12.22/Dockerfile)
 - [`5.11, 5.11.50`](https://github.com/stellirin/unifi-controller/blob/5.11.50/Dockerfile)
@@ -21,6 +24,7 @@ NOTE: `latest` may contain a Release Candidate build. If you wish for stability 
 - [`5.11.46`](https://github.com/stellirin/unifi-controller/blob/5.11.46/Dockerfile)
 - [`5.11.39`](https://github.com/stellirin/unifi-controller/blob/5.11.39/Dockerfile)
 - [`5.10, 5.10.27`](https://github.com/stellirin/unifi-controller/blob/5.10.27/Dockerfile)
+
 
 ## Quick reference
 

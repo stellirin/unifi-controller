@@ -1,7 +1,7 @@
 #
 # UniFi Network Controller
 #
-FROM adoptopenjdk:8-jre-openj9
+FROM adoptopenjdk:8-jre-openj9-focal
 
 ARG UNIFI_VER=5.14.23
 ARG UNIFI_URL=https://dl.ui.com/unifi/${UNIFI_VER}/unifi_sysvinit_all.deb
@@ -17,6 +17,8 @@ RUN curl -L -o /unifi.deb ${UNIFI_URL} \
     && dpkg -x /unifi.deb / \
     && rm -rf /unifi.deb
 
+# usr/lib/unifi/lib/ace.jar
+# PROTIP: unzip usr/lib/unifi/lib/ace.jar
 COPY log4j2.xml /usr/lib/unifi/
 
 COPY scripts/*.sh /

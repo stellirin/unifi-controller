@@ -1,4 +1,4 @@
-version: '3.7'
+version: "3.8"
 
 networks:
   default:
@@ -13,7 +13,7 @@ volumes:
 services:
 
   mongodb:
-    image: mongo:4.2
+    image: mongo:4.4
     container_name: unifi-mongodb
     volumes:
       # MongoDB init scripts
