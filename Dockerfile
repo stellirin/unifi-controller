@@ -3,7 +3,7 @@
 #
 FROM adoptopenjdk:8-jre-openj9-focal
 
-ARG UNIFI_VER=5.14.23
+ARG UNIFI_VER=6.2.17-ceb3ba714d
 ARG UNIFI_URL=https://dl.ui.com/unifi/${UNIFI_VER}/unifi_sysvinit_all.deb
 ARG UNIFI_USER=10017
 
@@ -18,6 +18,7 @@ RUN curl -L -o /unifi.deb ${UNIFI_URL} \
     && rm -rf /unifi.deb
 
 # usr/lib/unifi/lib/ace.jar
+# sudo apt-get install binutils xz-utils
 # PROTIP: unzip usr/lib/unifi/lib/ace.jar
 COPY log4j2.xml /usr/lib/unifi/
 

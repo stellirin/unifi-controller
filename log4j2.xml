@@ -1,23 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
-<!--
-  Extracted from /usr/lib/unifi/lib/ace.jar
-  PROTIP: unzip usr/lib/unifi/lib/ace.jar
--->
-
-<Configuration packages="com.ubnt.service.trace.logerror">
+<Configuration packages="com.ubnt.service.trace.logerror,com.ubnt.ace.logs">
   <Appenders>
     <Console name="Console" target="SYSTEM_OUT">
-      <PatternLayout charset="UTF-8" pattern="[%d{ISO8601}] &lt;%t&gt; %-5p %-6c{1} - %m%n" />
+      <PatternLayout charset="UTF-8" pattern="[%d{ISO8601}] &lt;%t&gt; %-5p %-6c{1} - %m%n"/>
     </Console>
 <!--
     <InMemoryAppender name="InMemoryAppender" activatedLogging="false">
-      <PatternLayout pattern="[%d{ISO8601}] &lt;%t&gt; %-5p %-6c{1} - %m%n" />
+      <PatternLayout pattern="[%d{ISO8601}] &lt;%t&gt; %-5p %-6c{1} - %m%n"/>
     </InMemoryAppender>
     <RollingFile name="server_log" fileName="logs/server.log" filePattern="logs/server.log.%i">
-      <PatternLayout pattern="[%d{ISO8601}] &lt;%t&gt; %-5p %-6c{1} - %m%n" />
+      <PatternLayout pattern="[%d{ISO8601}] &lt;%t&gt; %-5p %-6c{1} - %m%n"/>
       <SizeBasedTriggeringPolicy size="10 MB"/>
-      <DefaultRolloverStrategy max="3" fileIndex="min" />
+      <DefaultRolloverStrategy max="3" fileIndex="min"/>
     </RollingFile>
 -->
     <AnalyticsAppender name="AnalyticsAppender">

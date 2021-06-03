@@ -5,12 +5,9 @@ volumes:
 
 services:
   vscode:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: ghcr.io/stellirin/vscode-container:java-8
     user: vscode
     environment:
-      GITHUB_TOKEN:
       TZ: "Europe/Prague"
     volumes:
       - type: bind

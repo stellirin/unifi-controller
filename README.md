@@ -7,6 +7,7 @@ The UniFi® Software-Defined Networking (SDN) platform is an end-to-end system o
 > The 6.0.x and 6.1.x branches are currently not supported here, the transition to a new UI has had many regressions.
 
 - [`latest`](https://github.com/stellirin/unifi-controller/blob/master/Dockerfile)
+- [`6.2, 6.2.17`](https://github.com/stellirin/unifi-controller/blob/6.2.17/Dockerfile)
 - [`stable, 5.14, 5.14.23`](https://github.com/stellirin/unifi-controller/blob/5.14.23/Dockerfile)
 
 NOTE: `latest` may contain a beta release. If you wish for stability use the `stable` tag!

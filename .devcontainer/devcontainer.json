@@ -5,14 +5,12 @@
     ],
     "workspaceFolder": "/workspace",
     "service": "vscode",
-
     "name": "UniFi",
     "remoteUser": "vscode",
     "settings": {
-        "terminal.integrated.shell.linux": "/usr/bin/zsh",
+        "terminal.integrated.defaultProfile.linux": "zsh",
     },
     "extensions": [
-        "ms-azuretools.vscode-docker",
-        "github.vscode-pull-request-github"
+        "ms-azuretools.vscode-docker"
     ]
 }
