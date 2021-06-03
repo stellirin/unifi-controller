@@ -14,7 +14,7 @@ ENV BASEDIR=/usr/lib/unifi \
     RUNDIR=/var/run/unifi
 
 RUN curl -L -o /unifi.deb ${UNIFI_URL} \
-    && dpkg -x /unifi.deb / \
+    && dpkg --unpack /unifi.deb \
     && rm -rf /unifi.deb
 
 # usr/lib/unifi/lib/ace.jar
