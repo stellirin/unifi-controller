@@ -1,14 +1,6 @@
 # UniFi Controller on Docker
 
-Add the relevant environment variables to a '`.env`' file in this folder to customize the Docker Compose behaviour. Example:
-
-```conf
-CONTROLLER_IMAGE_TAG=5.12
-MONGO_INITDB_ROOT_USERNAME=admin
-MONGO_INITDB_ROOT_PASSWORD=D2D04E40B2C85D32985DB2B2
-MONGO_DB_USER=unifi
-MONGO_DB_PASS=C34C486E850D66B44ED34C55
-```
+Add the relevant environment variables to a '`.env`' file in this folder to customize the Docker Compose behaviour.
 
 ## Launch
 
@@ -16,7 +8,7 @@ MONGO_DB_PASS=C34C486E850D66B44ED34C55
 docker-compose up -d
 ```
 
-## Backup & Restore
+## Backup
 
 The Docker volumes can be backed up with:
 
@@ -35,6 +27,8 @@ docker run \
     alpine \
     tar -czf /backup/mongodb-$(date '+%Y-%m-%d').tar.gz -C /volume ./
 ```
+
+## Restore
 
 The last volume backups can be restored with:
 

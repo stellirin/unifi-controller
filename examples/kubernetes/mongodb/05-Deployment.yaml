@@ -1,16 +1,13 @@
 apiVersion: apps/v1
-kind: StatefulSet
+kind: Deployment
 metadata:
   namespace: unifi
-  name: mongodb
+  name: mongodb-4.4
   labels:
     app: mongodb
 
 spec:
-  replicas: 3
-  updateStrategy:
-    type: RollingUpdate
-  serviceName: mongodb
+  replicas: 1
   selector:
     matchLabels:
       app: mongodb
@@ -21,20 +18,10 @@ spec:
         app: mongodb
     spec:
 
-      affinity:
-        podAntiAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            - labelSelector:
-                matchExpressions:
-                  - key: app
-                    operator: In
-                    values:
-                      - mongodb
-              topologyKey: "kubernetes.io/hostname"
-
       initContainers:
         - name: mongo-init
-          image: mongo:4.0
+          image: mongo:4.4
+          imagePullPolicy: Always
           command: [
             "/entrypoint.sh",
           ]
@@ -61,23 +48,53 @@ spec:
 
       containers:
         - name: mongo
-          image: mongo:4.0
+          image: mongo:4.4
+          imagePullPolicy: Always
           args: [
             "mongod",
-            "--bind_ip_all",
-            "--keyFile", "/data/db/unifi-mongodb.key",
-            "--replSet", "unifi"
+            "--bind_ip_all"
           ]
           ports:
             - name: mongo
               containerPort: 27017
               protocol: TCP
+          livenessProbe:
+            exec:
+              command:
+                - pgrep
+                - mongod
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            successThreshold: 1
+            failureThreshold: 6
+          readinessProbe:
+            exec:
+              command:
+                - mongo
+                - --eval
+                - "db.adminCommand('ping')"
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 5
+            successThreshold: 1
+            failureThreshold: 6
           volumeMounts:
             # MongoDB storage volume
             - name: data
               mountPath: /data/db
+          resources:
+            requests:
+              cpu: 100m
+              memory: 1Gi
+            limits:
+              cpu: 1000m
+              memory: 1Gi
 
       volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: mongodb-4.4-pvc
         # MongoDB credentials
         - name: credentials
           projected:
@@ -97,11 +114,6 @@ spec:
                       path: MONGO_DB_USER
                     - key:  MONGO_DB_PASS
                       path: MONGO_DB_PASS
-              - secret:
-                  name: unifi-mongodb-keyfile-secret
-                  items:
-                    - key:  MONGODB_KEYFILE
-                      path: MONGODB_KEYFILE
 
         # MongoDB init scripts
         - name: initdb
@@ -113,7 +125,3 @@ spec:
                 path: 01-admin.sh
               - key: ENTRYPOINT_INIT_SH
                 path: entrypoint.sh
-
-        # MongoDB storage volume
-        - name: data
-          emptyDir: {}

@@ -36,7 +36,7 @@ services:
   controller:
     depends_on:
       - mongodb
-    image: stellirin/unifi-controller:${CONTROLLER_IMAGE_TAG:-stable}
+    image: stellirin/unifi-controller:${CONTROLLER_IMAGE_TAG:-latest}
     container_name: unifi-controller
     ports:
       - "1900:1900/udp"

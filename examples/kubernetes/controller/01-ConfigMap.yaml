@@ -6,8 +6,7 @@ metadata:
 
 data:
   MONGO_DB_NAME: "unifi"
-  MONGO_DB_HOST: "mongodb-0.mongodb:27017,mongodb-1.mongodb:27017,mongodb-2.mongodb"
+  MONGO_DB_HOST: "mongodb"
   MONGO_DB_PORT: "27017"
   MONGO_DB_USER_FILE: "/run/secrets/mongodb/MONGO_DB_USER"
   MONGO_DB_PASS_FILE: "/run/secrets/mongodb/MONGO_DB_PASS"
-  MONGO_DB_ARGS: "replicaSet=unifi"

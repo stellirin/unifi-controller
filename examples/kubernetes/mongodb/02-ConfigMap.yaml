@@ -2,6 +2,20 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   namespace: unifi
+  name: unifi-mongodb-configmap
+
+data:
+  MONGO_INITDB_DATABASE: "unifi"
+  MONGO_INITDB_ROOT_USERNAME_FILE: "/run/secrets/mongodb/MONGO_INITDB_ROOT_USERNAME"
+  MONGO_INITDB_ROOT_PASSWORD_FILE: "/run/secrets/mongodb/MONGO_INITDB_ROOT_PASSWORD"
+
+  MONGO_DB_USER_FILE: "/run/secrets/mongodb/MONGO_DB_USER"
+  MONGO_DB_PASS_FILE: "/run/secrets/mongodb/MONGO_DB_PASS"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  namespace: unifi
   name: unifi-mongodb-initdb-configmap
 
 data:
@@ -44,11 +58,5 @@ data:
 
     # Execute the entrypoint, it will eventually exit
     ./usr/local/bin/docker-entrypoint.sh $@
-
-    # Copy the MongoDB key to the DB folder,
-    # MongoDB will otherwise complain about too open permissions
-    cat /run/secrets/mongodb/MONGODB_KEYFILE > /data/db/unifi-mongodb.key
-    chown mongodb:mongodb /data/db/unifi-mongodb.key
-    chmod 400 /data/db/unifi-mongodb.key
 
     exit 0

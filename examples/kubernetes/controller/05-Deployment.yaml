@@ -18,32 +18,52 @@ spec:
         app: controller
     spec:
 
+      affinity:
+        nodeAffinity:
+          # Run on the master node
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: node-role.kubernetes.io/master
+                    operator: In
+                    values:
+                      - "true"
+
       containers:
         - name: controller
           image: stellirin/unifi-controller:stable
+          imagePullPolicy: Always
           ports:
             - name: discoverable
+              hostPort: 1900
               containerPort: 1900
               protocol: UDP
             - name: stun
+              hostPort: 3478
               containerPort: 3478
               protocol: UDP
             - name: speed-test
+              hostPort: 6789
               containerPort: 6789
               protocol: TCP
             - name: communication
+              hostPort: 8080
               containerPort: 8080
               protocol: TCP
             - name: controller
+              hostPort: 8443
               containerPort: 8443
               protocol: TCP
             - name: http-redirect
+              hostPort: 8880
               containerPort: 8880
               protocol: TCP
             - name: https-redirect
+              hostPort: 8843
               containerPort: 8843
               protocol: TCP
             - name: discovery
+              hostPort: 10001
               containerPort: 10001
               protocol: UDP
           envFrom:
@@ -53,22 +73,20 @@ spec:
             # MongoDB credentials
             - name: credentials
               mountPath: /run/secrets/mongodb
+            # Advanced controller configuration
+            - name: config
+              mountPath: /var/lib/unifi/sites/default/config.gateway.json
+              subPath: CONFIG_GATEWAY_JSON
             # UniFi Controller storage volume
             - name: data
               mountPath: /var/lib/unifi
-            - name: entrypoint
-              mountPath: /entrypoint.sh
-              subPath: entrypoint.sh
-          #   # UniFi Controller custom configuration
-          #   - name: unifi-config-gateway-json
-          #     mountPath: /var/lib/unifi/sites/default/config.gateway.json
-          # resources:
-          #   requests:
-          #     cpu: 50m
-          #     memory: 256Mi
-          #   limits:
-          #     cpu: 250m
-          #     memory: 512Mi
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 320Mi
 
       volumes:
         # MongoDB credentials
@@ -82,15 +100,16 @@ spec:
               - key:  MONGO_DB_PASS
                 path: MONGO_DB_PASS
 
-        # MongoDB init scripts
-        - name: entrypoint
+        # MongoDB credentials
+        - name: config
           configMap:
             name: unifi-controller-configmap
-            defaultMode: 0755
+            defaultMode: 0444
             items:
-              - key: ENTRYPOINT
-                path: entrypoint.sh
+              - key:  CONFIG_GATEWAY_JSON
+                path: CONFIG_GATEWAY_JSON
 
         # MongoDB storage volume
         - name: data
-          emptyDir: {}
+          persistentVolumeClaim:
+            claimName: controller-pvc
