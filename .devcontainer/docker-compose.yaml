@@ -5,7 +5,7 @@ volumes:
 
 services:
   vscode:
-    image: ghcr.io/stellirin/vscode-container:java-8
+    image: ghcr.io/stellirin/vscode-container:latest
     user: vscode
     environment:
       TZ: "Europe/Prague"
