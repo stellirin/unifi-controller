@@ -3,7 +3,7 @@
 #
 FROM adoptopenjdk:8-jre-openj9-focal
 
-ARG UNIFI_VER=6.2.23
+ARG UNIFI_VER=6.2.25
 ARG UNIFI_URL=https://dl.ui.com/unifi/${UNIFI_VER}/unifi_sysvinit_all.deb
 ARG UNIFI_USER=10017
 
