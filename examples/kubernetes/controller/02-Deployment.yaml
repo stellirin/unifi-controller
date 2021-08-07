@@ -11,27 +11,14 @@ spec:
   selector:
     matchLabels:
       app: controller
-
   template:
     metadata:
       labels:
         app: controller
     spec:
-
-      affinity:
-        nodeAffinity:
-          # Run on the master node
-          requiredDuringSchedulingIgnoredDuringExecution:
-            nodeSelectorTerms:
-              - matchExpressions:
-                  - key: node-role.kubernetes.io/master
-                    operator: In
-                    values:
-                      - "true"
-
       containers:
         - name: controller
-          image: stellirin/unifi-controller:stable
+          image: ghcr.io/stellirin/unifi-controller:latest
           imagePullPolicy: Always
           ports:
             - name: discoverable
@@ -66,17 +53,24 @@ spec:
               hostPort: 10001
               containerPort: 10001
               protocol: UDP
-          envFrom:
-            - configMapRef:
-                name: unifi-controller-configmap
+          env:
+            - name: MONGO_DB_NAME
+              value: "unifi"
+            - name: MONGO_DB_HOST
+              value: "mongodb"
+            - name: MONGO_DB_PORT
+              value: "27017"
+            - name: MONGO_DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: unifi-mongodb
+                  key: MONGO_DB_USER
+            - name: MONGO_DB_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: unifi-mongodb
+                  key: MONGO_DB_PASS
           volumeMounts:
-            # MongoDB credentials
-            - name: credentials
-              mountPath: /run/secrets/mongodb
-            # Advanced controller configuration
-            - name: config
-              mountPath: /var/lib/unifi/sites/default/config.gateway.json
-              subPath: CONFIG_GATEWAY_JSON
             # UniFi Controller storage volume
             - name: data
               mountPath: /var/lib/unifi
@@ -88,28 +82,7 @@ spec:
               cpu: 500m
               memory: 320Mi
 
-      volumes:
-        # MongoDB credentials
-        - name: credentials
-          secret:
-            secretName: unifi-mongodb-user-secret
-            defaultMode: 0444
-            items:
-              - key:  MONGO_DB_USER
-                path: MONGO_DB_USER
-              - key:  MONGO_DB_PASS
-                path: MONGO_DB_PASS
-
-        # MongoDB credentials
-        - name: config
-          configMap:
-            name: unifi-controller-configmap
-            defaultMode: 0444
-            items:
-              - key:  CONFIG_GATEWAY_JSON
-                path: CONFIG_GATEWAY_JSON
-
-        # MongoDB storage volume
+        # Controller storage
         - name: data
           persistentVolumeClaim:
             claimName: controller-pvc

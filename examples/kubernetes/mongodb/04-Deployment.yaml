@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   namespace: unifi
-  name: mongodb-4.4
+  name: mongodb-5.0
   labels:
     app: mongodb
 
@@ -11,30 +11,45 @@ spec:
   selector:
     matchLabels:
       app: mongodb
-
   template:
     metadata:
       labels:
         app: mongodb
     spec:
-
       initContainers:
         - name: mongo-init
-          image: mongo:4.4
+          image: mongo:5.0
           imagePullPolicy: Always
           command: [
             "/entrypoint.sh",
           ]
-          args: [
-            "mongod",
-          ]
-          envFrom:
-            - configMapRef:
-                name: unifi-mongodb-configmap
+          env:
+            - name: MONGO_INITDB_DATABASE
+              value: "unifi"
+            - name: MONGO_INITDB_ROOT_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: unifi-mongodb
+                  key: MONGO_INITDB_ROOT_USERNAME
+            - name: MONGO_INITDB_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: unifi-mongodb
+                  key: MONGO_INITDB_ROOT_PASSWORD
+            - name: MONGO_DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: unifi-mongodb
+                  key: MONGO_DB_USER
+            - name: MONGO_DB_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: unifi-mongodb
+                  key: MONGO_DB_PASS
           volumeMounts:
-            # MongoDB credentials
-            - name: credentials
-              mountPath: /run/secrets/mongodb
+            # MongoDB storage volume
+            - name: data
+              mountPath: /data/db
             # MongoDB init scripts
             - name: initdb
               mountPath: /docker-entrypoint-initdb.d/01-admin.sh
@@ -42,13 +57,10 @@ spec:
             - name: initdb
               mountPath: /entrypoint.sh
               subPath: entrypoint.sh
-            # MongoDB storage volume
-            - name: data
-              mountPath: /data/db
 
       containers:
         - name: mongo
-          image: mongo:4.4
+          image: mongo:5.0
           imagePullPolicy: Always
           args: [
             "mongod",
@@ -94,31 +106,12 @@ spec:
       volumes:
         - name: data
           persistentVolumeClaim:
-            claimName: mongodb-4.4-pvc
-        # MongoDB credentials
-        - name: credentials
-          projected:
-            defaultMode: 0444
-            sources:
-              - secret:
-                  name: unifi-mongodb-admin-secret
-                  items:
-                    - key:  MONGO_INITDB_ROOT_USERNAME
-                      path: MONGO_INITDB_ROOT_USERNAME
-                    - key:  MONGO_INITDB_ROOT_PASSWORD
-                      path: MONGO_INITDB_ROOT_PASSWORD
-              - secret:
-                  name: unifi-mongodb-user-secret
-                  items:
-                    - key:  MONGO_DB_USER
-                      path: MONGO_DB_USER
-                    - key:  MONGO_DB_PASS
-                      path: MONGO_DB_PASS
+            claimName: mongodb-5.0-pvc
 
         # MongoDB init scripts
         - name: initdb
           configMap:
-            name: unifi-mongodb-initdb-configmap
+            name: unifi-mongodb-initdb
             defaultMode: 0555
             items:
               - key: 01_ADMIN_SH

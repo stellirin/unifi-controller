@@ -4,9 +4,9 @@ The UniFi® Software-Defined Networking (SDN) platform is an end-to-end system o
 
 ## Supported tags and respective `Dockerfile` links
 
-> The 6.0.x and 6.1.x branches are currently not supported here, the transition to a new UI has had many regressions.
+> The 6.0.x and 6.1.x branches were not supported here, the transition to the new UI had many regressions (even 6.2.x has its issues).
 
-- [`latest`](https://github.com/stellirin/unifi-controller/blob/master/Dockerfile)
+- [`latest`](https://github.com/stellirin/unifi-controller/blob/main/Dockerfile)
 - [`6.2, 6.2.26`](https://github.com/stellirin/unifi-controller/blob/v6.2.26/Dockerfile)
 - [`stable, 5.14, 5.14.23`](https://github.com/stellirin/unifi-controller/blob/5.14.23/Dockerfile)
 
@@ -28,7 +28,6 @@ NOTE: `latest` may contain a beta release. If you wish for stability use the `st
 - [`5.11.39`](https://github.com/stellirin/unifi-controller/blob/5.11.39/Dockerfile)
 - [`5.10, 5.10.27`](https://github.com/stellirin/unifi-controller/blob/5.10.27/Dockerfile)
 
-
 ## Quick reference
 
 - **Where to get help**: [The UniFi Community Forums](https://community.ui.com/)
@@ -44,7 +43,7 @@ The UniFi Network Controller is the front end for the UniFi Software-Defined Net
 
 This project is not an official container image, nor is it associated with Ubiquiti in any way. It was created by reverse engineering the original UniFi scripts.
 
-Motivation for this project comes from the limitations of the source DEB. Specifically, the DEB is restricted to use MongoDB v3.4 because of how the UniFi scripts connect to a locally installed DB. However, UniFi runs perfectly fine on MongoDB v4.0 when connecting to a 'remote' MongoDB installation (i.e. via URI instead of socket).
+Motivation for this project comes from the limitations of the source DEB. Specifically, the DEB is restricted to use obsolete versions of MongoDB because of how the UniFi scripts connect to a locally installed DB. However, UniFi runs perfectly fine on even the latest MongoDB v5.0 when connecting to a 'remote' MongoDB installation (i.e. via URI instead of socket).
 
 By default the controller will generate untrusted TLS certificates. This container can also use trusted certificates, for example from Let's Encrypt. The container will also watch any provided certificates for changes and trigger a restart.
 
@@ -54,7 +53,7 @@ By default the controller will generate untrusted TLS certificates. This contain
 
 ## How to use this image
 
-This container image must be used in conjunction with an existing MongoDB installation. The simplest method is to use a MongoDB container image. See the [examples folder](https://github.com/stellirin/unifi-controller/tree/master/examples) for tested methods of running this image.
+This container image must be used in conjunction with an existing MongoDB installation. The simplest method is to use a MongoDB container image. See the [examples folder](https://github.com/stellirin/unifi-controller/tree/main/examples) for tested methods of running this image.
 
 ### Environment Variables
 
@@ -112,7 +111,7 @@ Default is to take the same value as `MONGO_DB_URI`.
 
 The port used for the controller UI. By default a container runs without the required privileges to bind to the default HTTPS port. If your container runs with privileges you can change this to use port `443`.
 
-Typically port `443` is achieved at the container platform level (bind external port `443` to internal port `8443`) but this is useful if you are using `--network="host"` and `--cap-add="NET_BIND_SERVICE"`.
+Typically port `443` is achieved at the container platform level (bind external port `443` to internal port `8443`) but this is useful if you are using Docker with `--network="host"` and `--cap-add="NET_BIND_SERVICE"`.
 
 Default value is `8443`.
 
@@ -147,7 +146,7 @@ No default value.
 As an alternative to passing sensitive information via environment variables, `_FILE` may be appended to some of the previously listed environment variables, causing the initialization script to load the values for those variables from files present in the container. In particular, this can be used to load passwords from secrets stored in `/run/secrets/<secret_name>` files. For example:
 
 ```sh
-docker run --name unifi-controller -e MONGO_DB_PASS_FILE=/run/secrets/mongo-db-password -d stellirin/unifi-controller
+docker run --name unifi-controller -e MONGO_DB_PASS_FILE=/run/secrets/mongo-db-password -d stellirin/unifi-controller:latest
 ```
 
 Currently, this is only supported for `MONGO_DB_HOST`, `MONGO_DB_PORT`, `MONGO_DB_NAME`, `MONGO_DB_USER`, `MONGO_DB_PASS`, `MONGO_DB_URI`, and `MONGO_DB_STAT_URI`.

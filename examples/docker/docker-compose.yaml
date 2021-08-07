@@ -13,18 +13,18 @@ volumes:
 services:
 
   mongodb:
-    image: mongo:4.4
+    image: mongo:5.0
     container_name: unifi-mongodb
     volumes:
-      # MongoDB init scripts
-      - type: bind
-        read_only: true
-        source: ./mongodb/initdb.d/01-admin.sh
-        target: /docker-entrypoint-initdb.d/01-admin.sh
       # MongoDB storage volume
       - type: volume
         source: mongodb
         target: /data/db
+      # MongoDB init scripts
+      - type: bind
+        read_only: true
+        source: ./01-admin.sh
+        target: /docker-entrypoint-initdb.d/01-admin.sh
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME:-admin}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD:-admin}
@@ -36,7 +36,7 @@ services:
   controller:
     depends_on:
       - mongodb
-    image: stellirin/unifi-controller:${CONTROLLER_IMAGE_TAG:-latest}
+    image: ghcr.io/stellirin/unifi-controller:${CONTROLLER_IMAGE_TAG:-latest}
     container_name: unifi-controller
     ports:
       - "1900:1900/udp"
@@ -48,15 +48,9 @@ services:
       - "8880:8880/tcp"
       - "10001:10001/udp"
     volumes:
-      # Controller storage volume
       - type: volume
         source: controller
         target: /var/lib/unifi
-      # Advanced gateway configuration
-      # - type: bind
-      #   read_only: true
-      #   source: ./controller/config.gateway.json
-      #   target: /var/lib/unifi/sites/default/config.gateway.json
     environment:
       MONGO_DB_HOST: ${MONGO_DB_HOST:-mongodb}
       MONGO_DB_PORT: ${MONGO_DB_PORT:-27017}
