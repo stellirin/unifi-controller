@@ -45,6 +45,7 @@
     <Logger name="org.apache.tomcat" level="ERROR" />
     <Logger name="org.apache.commons" level="WARN" />
     <Logger name="org.apache.catalina" level="ERROR" />
+    <Logger name="org.hibernate.validator" level="WARN" />
     <Logger name="com.mongodb" level="ERROR" />
     <Logger name="org.mongodb" level="ERROR" />
 
