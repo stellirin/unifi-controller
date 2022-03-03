@@ -13,11 +13,12 @@ then
     exit 1
 fi
 
-wget -O unifi.${UNIFI_VER}.deb https://dl.ui.com/unifi/${UNIFI_VER}/unifi_sysvinit_all.deb
-
 mkdir -p extract/${UNIFI_VER}
+
+wget -O extract/unifi.${UNIFI_VER}.deb https://dl.ui.com/unifi/${UNIFI_VER}/unifi_sysvinit_all.deb
+
 pushd extract/${UNIFI_VER}
-    ar -x ../../unifi.${UNIFI_VER}.deb
+    ar -x ../unifi.${UNIFI_VER}.deb
     tar xvf control.tar.gz
     tar xvf data.tar.xz
 popd

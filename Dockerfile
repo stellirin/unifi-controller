@@ -1,9 +1,9 @@
 #
 # UniFi Network Controller
 #
-FROM adoptopenjdk:8-jre-openj9-focal
+FROM ibm-semeru-runtimes:open-8-jre-focal
 
-ARG UNIFI_VER=6.5.55
+ARG UNIFI_VER=7.0.23
 ARG UNIFI_URL=https://dl.ui.com/unifi/${UNIFI_VER}/unifi_sysvinit_all.deb
 ARG UNIFI_USER=10017
 
@@ -19,7 +19,7 @@ RUN curl -L -o /unifi.deb ${UNIFI_URL} \
 
 # usr/lib/unifi/lib/ace.jar
 # sudo apt-get install binutils xz-utils
-# PROTIP: unzip -p usr/lib/unifi/lib/ace.jar log4j2.xml > log4j2.xml
+# PROTIP: unzip -p usr/lib/unifi/lib/ace.jar log4j2.xml > /workspace/log4j2.new.xml
 COPY log4j2.xml /usr/lib/unifi/
 
 COPY scripts/*.sh /
