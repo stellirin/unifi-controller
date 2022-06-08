@@ -5,12 +5,13 @@ The UniFi® Software-Defined Networking (SDN) platform is an end-to-end system o
 ## Supported tags and respective `Dockerfile` links
 
 - [`latest`](https://github.com/stellirin/unifi-controller/blob/main/Dockerfile)
-- [`7.1, 7.1.65`](https://github.com/stellirin/unifi-controller/blob/v7.1.65/Dockerfile)
+- [`7.1, 7.1.66`](https://github.com/stellirin/unifi-controller/blob/v7.1.66/Dockerfile)
 
 NOTE: `latest` may contain a beta release. If you wish for stability use a specific tag!
 
 ## Unsupported tags
 
+- [`7.1.65`](https://github.com/stellirin/unifi-controller/blob/v7.1.65/Dockerfile)
 - [`7.1.61`](https://github.com/stellirin/unifi-controller/blob/v7.1.61/Dockerfile)
 - [`7.0, 7.0.25`](https://github.com/stellirin/unifi-controller/blob/v7.0.25/Dockerfile)
 - [`7.0.23`](https://github.com/stellirin/unifi-controller/blob/v7.0.23/Dockerfile)
