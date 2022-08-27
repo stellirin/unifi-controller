@@ -70,6 +70,11 @@ spec:
                 secretKeyRef:
                   name: unifi-mongodb
                   key: MONGO_DB_PASS
+            # No, I'm not paranoid!
+            - name: LOG4J_FORMAT_MSG_NO_LOOKUPS
+              value: "true"
+            - name: JVM_EXTRA_OPTS
+              value: "-Dlog4j2.formatMsgNoLookups=true"
           volumeMounts:
             # UniFi Controller storage volume
             - name: data
@@ -77,10 +82,9 @@ spec:
           resources:
             requests:
               cpu: 100m
-              memory: 256Mi
+              memory: 512Mi
             limits:
-              cpu: 500m
-              memory: 320Mi
+              memory: 1024Mi
 
         # Controller storage
         - name: data

@@ -3,7 +3,7 @@
 #
 FROM ibm-semeru-runtimes:open-8-jre-focal
 
-ARG UNIFI_VER=7.1.66
+ARG UNIFI_VER=7.1.67
 ARG UNIFI_URL=https://dl.ui.com/unifi/${UNIFI_VER}/unifi_sysvinit_all.deb
 ARG UNIFI_USER=10017
 

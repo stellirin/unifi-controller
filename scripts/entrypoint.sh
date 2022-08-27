@@ -209,7 +209,7 @@ trap unifi_stop INT KILL TERM
 # Keep PID 1 alive until UniFi exits
 while true
 do
-    # This doesn't actually kill the process, it just tests if $PID is something that could be killed (i.e. the process exists)
+    # This doesn't actually kill the process, it just tests if $PID is something that _could_ be killed (meaning: the process actually exists)
     kill -0 $PID
     if [ $? -gt 0 ]
     then
