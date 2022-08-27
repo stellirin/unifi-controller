@@ -13,6 +13,11 @@
       <SizeBasedTriggeringPolicy size="10 MB"/>
       <DefaultRolloverStrategy max="3" fileIndex="min"/>
     </RollingFile>
+    <RollingFile name="migration_log" fileName="logs/migration.log" filePattern="logs/migration.log.%i">
+      <PatternLayout pattern="[%d{ISO8601}] &lt;%t&gt; %-5p %-6c{1} - %m%n"/>
+      <SizeBasedTriggeringPolicy size="10 MB"/>
+      <DefaultRolloverStrategy max="1" fileIndex="min" />
+    </RollingFile>
 -->
     <AnalyticsAppender name="AnalyticsAppender">
       <ReportBurstFilter>
@@ -30,9 +35,15 @@
 <!--
       <AppenderRef ref="InMemoryAppender" />
       <AppenderRef ref="server_log" />
--->
       <AppenderRef ref="AnalyticsAppender" level="ERROR" />
+-->
     </Root>
+    <Logger name="migration">
+      <AppenderRef ref="Console" />
+<!--
+      <AppenderRef ref="migration_log" />
+-->
+    </Logger>
     <Logger name="org.apache.log4j.xml" level="info" />
     <Logger name="java" level="ERROR" />
     <Logger name="javax" level="ERROR" />
