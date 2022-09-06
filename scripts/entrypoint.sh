@@ -32,7 +32,7 @@ set_tls_keystore() {
             if [ -f "/var/lib/unifi/keystore" ]
             then
                 echo "INFO: Creating backup TLS keystore ..."
-                mv /var/lib/unifi/keystore /var/lib/unifi/keystore.backup
+                mv /var/lib/unifi/keystore /tmp/keystore.backup
             fi
 
             echo "INFO: Creating intermediate TLS keystore ..."
@@ -53,39 +53,42 @@ set_tls_keystore() {
                     -srckeystore /tmp/keystore.p12 \
                     -srcstoretype PKCS12 \
                     -srcstorepass unifi \
-                    -destkeystore /var/lib/unifi/keystore \
+                    -destkeystore /tmp/keystore \
                     -deststorepass aircontrolenterprise \
                     -destkeypass aircontrolenterprise \
                     -alias ubnt
             else
                 echo "ERROR: Intermediate TLS keystore not created!"
-                if [ -f "/var/lib/unifi/keystore.backup" ]
+                if [ -f "/tmp/keystore.backup" ]
                 then
                     echo "INFO: Restoring backup TLS keystore"
-                    mv /var/lib/unifi/keystore.backup /var/lib/unifi/keystore
+                    mv /tmp/keystore.backup /var/lib/unifi/keystore
                 fi
                 exit 1
             fi
 
-            if [ -f "/var/lib/unifi/keystore" ]
+            if [ -f "/tmp/keystore" ]
             then
                 echo "INFO: Final TLS keystore created"
-                rm -f /tmp/fullchain.p12
-                if [ -f "/var/lib/unifi/keystore.backup" ]
+                rm -f /tmp/keystore.p12
+                if [ -f "/tmp/keystore.backup" ]
                 then
                     echo "INFO: Removing backup TLS keystore"
-                    rm -f /var/lib/unifi/keystore.backup
+                    rm -f /tmp/keystore.backup
                 fi
+
+                echo "INFO: Moving final TLS keystore"
+                mv /tmp/keystore /var/lib/unifi/keystore
 
                 # Certificates installed, watch for changes
                 /certwatch.sh &
             else
                 echo "ERROR: Final TLS keystore not created!"
-                rm -f /tmp/fullchain.p12
-                if [ -f "/var/lib/unifi/keystore.backup" ]
+                rm -f /tmp/keystore.p12
+                if [ -f "/tmp/keystore.backup" ]
                 then
                     echo "INFO: Restoring backup TLS keystore"
-                    mv /var/lib/unifi/keystore.backup /var/lib/unifi/keystore
+                    mv /tmp/keystore.backup /var/lib/unifi/keystore
                 fi
                 exit 1
             fi
